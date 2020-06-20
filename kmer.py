@@ -22,6 +22,12 @@ def hamming(s1 ,s2):
 def revers_complimernt(gen, dna=True):
     return "".join(map(lambda x: dna_nucleotide_map[x] if dna else rna_nucleotide_map[x], gen[::-1]))
 
+def dna_to_rna(dna):
+    return dna.replace("T","U")
+def rna_to_dna(dna):
+    return dna.replace("U","T")
+
+
 def enumerat_kmer(gen, k):
     for i in range(len(gen)-k+1):
         yield gen[i:k+i]
