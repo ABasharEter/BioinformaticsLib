@@ -10,14 +10,15 @@ def pares_input2(text):
     return p
 
 if __name__ == "__main__":
-    txt = """(2, 4), (3, 6), (5, 1), (7, 9), (10, 12), (11, 8)
+    txt = """(+1 +2 +3 +4)(+5 +6)(+7+8+9)
 """.split("\n")
-    p = pares_input2(txt[0])
-    #i1,i2,i3,i4 = [int(x) for x in txt[1].split(", ")]
-    y = graph_to_genom(p)
+    r = pares_input(txt[0])
+    #b = pares_input(txt[1])
+    z = chromosome_to_cycle(r,b)
+    print(z)
     #print(", ".join((f"({u}, {v})" for u,v in y)))
-    y = ["("+" ".join(str(x) if x < 0 else f"+{x}" for x in v)+")" for v in y]
-    print(" ".join(y))
+    y = [" ".join(["(" + " ".join([str(x) if x < 0 else "+" + str(x) for x in v]) + ")" for v in yy]) for yy in z]
+    print("\n".join(y))
     
     
     
