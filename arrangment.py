@@ -1,3 +1,5 @@
+import kmer
+
 def greedy_sort(p):
     res = []
     for i in range(1, max(p)+1):
@@ -142,3 +144,11 @@ def break_genom(p, i1, i2, i3, i4):
     p = graph_to_genom(g)
     return p
     
+
+def shared_kmer(p,q,k):
+    l1 = list(kmer.enumerat_kmer(p,k))
+    l2 = list(kmer.enumerat_kmer("".join((reversed(kmer.revers_complimernt(p)))),k))
+    s = set((i,j) for i,x in enumerate(kmer.enumerat_kmer(q,k)) for j,y in enumerate(l1)  if x==y)
+    s2 = set((i,j) for i,x in enumerate(kmer.enumerat_kmer(q,k)) for j,y in enumerate(l2)  if x==y)
+    s.update(s2)
+    return len(s)
