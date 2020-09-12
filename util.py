@@ -4,7 +4,15 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 def print_array(a):
-    [print("\t".join(list(map(str, map(int, x))))) for x in a]
+    [print("\t".join(list(map(str, map(int, x))))) for x in a]    
+
+
+def print_weighted_comma_graph(g):
+    return "\n".join(["->".join((str(k),",".join(":".join((str(u),str(w))) for u,w in v.items()))) for k,v in g.items()])
+
+
+def print_weighted_lines_graph(g):
+    return "\n".join(["->".join((str(k),":".join((str(u),str(w)))))  for k,v in g.items() for u,w in v.items()])
 
 
 def graph2edges(g):
