@@ -179,7 +179,6 @@ def matching_alignment(s1, s2, w, alignment_type='global'):
 
             if alignment_type=='local':
                 dp[i,j] = max(0,dp[i,j])
-    return dp
     layer = 'middle'
     if alignment_type=='local':
         i,j = [(i,j) for i in range(len(s1)+1) for j in range(len(s2)+1) if dp[i,j] == m][0]
