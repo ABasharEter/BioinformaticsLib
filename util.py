@@ -22,3 +22,10 @@ def graph2edges(g):
             v = list(v.items())
         e.extend(zip([k]*len(v),v))
     return e
+
+def read_graph(lines):
+    g = {}
+    for l in lines:
+        u,v = l.split("->")
+        g.setdefault(u,[]).append(v)
+    return g

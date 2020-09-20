@@ -1,6 +1,8 @@
 import kmer
 
 import numpy as np
+import copy
+import amino
 
 def parse_wieghtd_graph(data):
     res = {}
@@ -311,4 +313,80 @@ def ta2g(ta,rooted=False):
         g[ta[2]][ta[3]] = g[ta[3]][ta[2]] = kmer.hamming(v,u)
         s += g[ta[2]][ta[3]]
     return s,g
-                
+
+def nearest_neighbors(t,e):
+    u,v = e
+    t1 = copy.deepcopy(t)
+    t2 = copy.deepcopy(t)
+    xu,yu = [i for i in t[u] if i != v]
+    xv,yv = [i for i in t[v] if i != u]
+    t1[u] = [xu,xv,v]
+    t1[v] = [yu,yv,u]
+    t1[yu].remove(u)
+    t1[yu].append(v)
+    t1[xv].remove(v)
+    t1[xv].append(u)
+    t2[u] = [xu,yv,v]
+    t2[v] = [xv,yu,u]
+    t2[yv].remove(v)
+    t2[yv].append(u)
+    t2[yu].remove(u)
+    t2[yu].append(v)
+    return t1,t2
+    
+    
+    
+def paths_dfs(g, path, paths = []):   
+    u,w = path[-1]              
+    if u in g and g[u]:
+        for k,v in g[u].items():
+            new_path = path + [(k,v)]
+            paths = paths_dfs(g, new_path, paths)
+    else:
+        paths += [path]
+    return paths
+
+def spec2g(s):
+    imassmap = {v:k for k,v in amino.amino_mass.items()}
+    s = [0] + s
+    g = {k:{} for k in s}
+    for i in range(1,len(g)):
+        for j in range(i):
+            d = s[i] - s[j]
+            if d in imassmap:
+                g[s[j]][s[i]] = imassmap[d]
+    return g
+
+def ideal_spec(p):
+    s = [amino.amino_mass[x] for x in p]
+    r = []
+    for i in range(1,len(s)):
+        r.append(sum(s[:i]))
+        r.append(sum(s[i:]))
+    r.append(sum(s))
+    return sorted(r)
+        
+    
+
+def decoding_ideal_spectrum(s):
+    g = spec2g(s)
+    p = paths_dfs(g,[(0,None)])
+    for pi in p:
+        pi = [x[1] for x in pi[1:]]
+        if ideal_spec(pi) == sorted(s):
+            return "".join(pi)
+
+def pep2vec(p):
+    s = [amino.amino_mass[x] for x in p]
+    s = [sum(s[:i]) for i in range(1,len(s)+1)]
+    a = [0]*(max(s)+1)
+    for i in s:
+        a[i] = 1
+    return a[1:]
+
+def vec2pep(v):
+    s = [0] + [i+1 for i in range(len(v)) if v[i] ==1]
+    imassmap = {v:k for k,v in amino.amino_mass.items()}
+    p = "".join([imassmap[s[i]-s[i-1]] for i in range(1,len(s))])
+    return p
+    
