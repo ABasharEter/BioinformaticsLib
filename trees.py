@@ -390,3 +390,41 @@ def vec2pep(v):
     p = "".join([imassmap[s[i]-s[i-1]] for i in range(1,len(s))])
     return p
     
+def score_pep(pep,spec):
+    v = pep2vec(pep)
+    l = min(len(v), len(spec))
+    return np.dot(v[:l],spec[:l])
+
+def peptide_identification(spec, p):
+    total_mass = len(spec)
+    i = 0
+    mass = 0
+    max_r,r = 0,None
+    for j in range(len(p)):
+        mass += amino.amino_mass[p[j]]
+        while mass > total_mass and i<=j:
+            mass -= amino.amino_mass[p[i]]
+            i += 1
+        if mass == total_mass:
+            r,max_r = max([(p[i:j+1],score_pep(p[i:j+1], spec)), (r,max_r)], key = lambda x: x[1])
+    return r,max_r
+
+def pms_search(specs, p, t):
+    res = []
+    for spec in specs:
+        r,m = peptide_identification(spec, p)
+        if m > t:
+            res.append(r)
+    return res
+
+def dict_size(spec, t, ms, prop = True):
+    spec = [0] + list(spec)
+    l = len(spec)
+    dp = np.zeros((l,ms*2), dtype=np.float64 if prop else np.int)
+    sizes = [v for k,v in amino.amino_mass.items() if k not in "ZX"]
+    dp[0,0] = 1
+    for i in range(1, l):
+        for j in range(ms+1):
+            dp[i, j] = sum([dp[i - a, j - spec[i]]/len(sizes) if prop else dp[i - a, j - spec[i]]
+                             for a in sizes if i - a >= 0 ])
+    return sum(dp[-1,t:ms])
